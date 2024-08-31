@@ -1,0 +1,53 @@
+study-planner-app/
+│
+├── backend/                            # Backend code and resources
+│   ├── config/                         # Configuration files
+│   │   ├── database.py                 # Database connection settings
+│   │   ├── oauth.py                    # OAuth setup for Google/Outlook
+│   │   └── settings.py                 # Application settings (environment variables)
+│   │
+│   ├── controllers/                    # Controllers for handling requests
+│   │   ├── auth_controller.py          # Logic for user authentication
+│   │   ├── calendar_controller.py       # Logic for calendar integration
+│   │   ├── course_controller.py         # Logic for handling course data
+│   │   └── studyplan_controller.py      # Logic for study plans
+│   │
+│   ├── models/                         # Database models
+│   │   ├── user.py                     # User model
+│   │   ├── course.py                   # Course model
+│   │   ├── study_session.py             # Study session model
+│   │   └── study_plan.py               # Study plan model
+│   │ 
+│   ├── routes/                         # API routes
+│   │   ├── auth_routes.py              # Authentication routes (login/signup)
+│   │   ├── calendar_routes.py           # Routes for calendar-related requests
+│   │   ├── course_routes.py             # Routes for managing courses
+│   │   └── studyplan_routes.py          # Routes for study plans
+│   │
+│   ├── services/                       # Business logic and service layer
+│   │   ├── schedule_service.py          # Logic for creating study schedules
+│   │   ├── notification_service.py      # Logic for notifications/reminders
+│   │   └── break_suggestion_service.py  # Logic for study/break suggestions
+│   │
+│   ├── tests/                          # Testing files
+│   │   ├── test_auth.py                # Tests for authentication
+│   │   ├── test_calendar.py             # Tests for calendar integration
+│   │   ├── test_course.py              # Tests for courses
+│   │   └── test_studyplan.py           # Tests for study plans
+│   │
+│   ├── app.py                          # Main application entry point
+│   └── requirements.txt                # Dependencies and packages
+│
+├── frontend/                           # Frontend code (Optional)
+│   ├── public/                         # Public assets (index.html, etc.)
+│   ├── src/                            # Source files for the frontend
+│   │   ├── components/                 # React components (if using React)
+│   │   ├── pages/                      # Page components
+│   │   ├── services/                   # API service calls to backend
+│   │   ├── App.js                      # Main App component
+│   │   └── index.js                    # React entry point
+│   │
+│   └── package.json                    # Frontend dependencies
+│
+├── README.md                           # Project documentation
+└── LICENSE                              # Licensing information (if applicable)
