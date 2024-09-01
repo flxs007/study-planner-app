@@ -70,9 +70,9 @@ exports.updateCourse = async (req, res) => {
     }
 };
 
-// Delete a course
+//delete course
 exports.deleteCourse = async (req, res) => {
-    const { id } = req.params;
+    const { id } = req.params; 
 
     try {
         const deletedCourse = await Course.findByIdAndDelete(id);
@@ -82,10 +82,10 @@ exports.deleteCourse = async (req, res) => {
         return res.json({ success: true, message: 'Course deleted successfully' });
     } catch (err) {
         console.error('Error deleting course:', err);
-        return res.status(400).json({
-            success: false, 
-            message: 'Error deleting course', 
-            error: err.message 
+        return res.status(500).json({
+            success: false,
+            message: 'Error deleting course',
+            error: err.message
         });
     }
 };
