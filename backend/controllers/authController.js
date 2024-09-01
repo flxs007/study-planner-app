@@ -1,5 +1,4 @@
-const User = require('../models/User'); 
-const bcrypt = require('bcrypt');        
+const User = require('../models/User');
 
 // Register user
 const registerUser = async (req, res) => {
@@ -7,7 +6,6 @@ const registerUser = async (req, res) => {
         const { username, email, password } = req.body;
 
         console.log('Received registration request body:', req.body);
-        
 
         if (!username || !email || !password) {
             return res.status(400).json({ error: "All fields are required" });
@@ -19,14 +17,11 @@ const registerUser = async (req, res) => {
             return res.status(400).json({ error: "User already exists with this email" });
         }
 
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-
+        // Save the new user with plaintext password
         const newUser = new User({
             username,
             email,
-            password: hashedPassword, 
+            password, // Store plaintext password directly
         });
 
         // Save the new user
@@ -45,7 +40,6 @@ const loginUser = async (req, res) => {
 
         const { email, password } = req.body;
 
-
         if (!email || !password) {
             return res.status(400).json({ error: "Email and password are required" });
         }
@@ -56,8 +50,8 @@ const loginUser = async (req, res) => {
             return res.status(400).json({ error: "Invalid email or password" });
         }
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
+        // Compare plain text password directly
+        if (user.password !== password) {
             console.log('Password mismatch for user:', email);
             return res.status(400).json({ error: "Invalid email or password" });
         }
