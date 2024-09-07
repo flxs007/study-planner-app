@@ -1,43 +1,31 @@
+const StudyPlan = require('../models/StudyPlan');
+const asyncHandler = require('../utils/asyncHandler');
 
-const StudyPlan = require('../models/StudyPlan'); 
+// Get all study plans
+exports.getAllStudyPlans = asyncHandler(async (req, res) => {
+  const plans = await StudyPlan.find({ userId: req.user.id });
+  res.json(plans);
+});
 
-exports.getAllStudyPlans = async (req, res) => {
-  try {
-    const plans = await StudyPlan.find({ userId: req.user.id });
-    res.json(plans);
-  } catch (error) {
-    res.status(500).json({ message: 'Error retrieving study plans' });
-  }
-};
-
-exports.createStudyPlan = async (req, res) => {
+// Create a study plan
+exports.createStudyPlan = asyncHandler(async (req, res) => {
   const newPlan = new StudyPlan({
     userId: req.user.id, 
     ...req.body 
   });
   
-  try {
-    const savedPlan = await newPlan.save();
-    res.status(201).json(savedPlan);
-  } catch (error) {
-    res.status(400).json({ message: 'Error creating study plan' });
-  }
-};
+  const savedPlan = await newPlan.save();
+  res.status(201).json(savedPlan);
+});
 
-exports.updateStudyPlan = async (req, res) => {
-  try {
-    const updatedPlan = await StudyPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    res.json(updatedPlan);
-  } catch (error) {
-    res.status(404).json({ message: 'Study plan not found' });
-  }
-};
+// Update a study plan
+exports.updateStudyPlan = asyncHandler(async (req, res) => {
+  const updatedPlan = await StudyPlan.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  res.json(updatedPlan);
+});
 
-exports.deleteStudyPlan = async (req, res) => {
-  try {
-    await StudyPlan.findByIdAndRemove(req.params.id);
-    res.status(204).send();
-  } catch (error) {
-    res.status(404).json({ message: 'Study plan not found' });
-  }
-};
+// Delete a study plan
+exports.deleteStudyPlan = asyncHandler(async (req, res) => {
+  await StudyPlan.findByIdAndRemove(req.params.id);
+  res.status(204).send();
+});
