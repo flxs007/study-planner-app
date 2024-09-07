@@ -1,91 +1,89 @@
 const Course = require('../models/Course');
+const asyncHandler = require('../utils/asyncHandler');
 
-// Get all courses
-exports.getAllCourses = async (req, res) => {
-    try {
-        const courses = await Course.find();
-        return res.status(200).json({ success: true, courses });
-    } catch (err) {
-        console.error('Error fetching courses:', err);
-        return res.status(500).json({ success: false, message: 'Error fetching courses' });
-    }
-};
+// Get all courses excluding soft-deleted ones
+exports.getAllCourses = asyncHandler(async (req, res) => {
+  const courses = await Course.find({ deleted: false });  // Exclude deleted courses
+  res.status(200).json({ success: true, courses });
+});
 
 // Create a new course
-exports.createCourse = async (req, res) => {
-    const { title, description, instructor } = req.body;
+exports.createCourse = asyncHandler(async (req, res) => {
+  const { title, description, instructor, deadline } = req.body;
 
-    // Validate request body
-    if (!title || !description || !instructor) {
-        return res.status(400).json({
-            success: false, 
-            message: 'Please provide all required fields: title, description, and instructor.'
-        });
-    }
+  if (!title || !description || !instructor) {
+    return res.status(400).json({
+      success: false, 
+      message: 'Please provide all required fields: title, description, and instructor.'
+    });
+  }
 
-    const newCourse = new Course({ title, description, instructor });
-
-    try {
-        const savedCourse = await newCourse.save();
-        return res.status(201).json({ success: true, course: savedCourse });
-    } catch (err) {
-        console.error('Error creating course:', err);
-        return res.status(500).json({
-            success: false, 
-            message: 'Error creating course', 
-            error: err.message 
-        });
-    }
-};
+  const newCourse = new Course({ title, description, instructor, deadline });
+  const savedCourse = await newCourse.save();
+  res.status(201).json({ success: true, course: savedCourse });
+});
 
 // Update a course
-exports.updateCourse = async (req, res) => {
-    const { id } = req.params;
-    const updatedData = req.body;
+exports.updateCourse = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const updatedData = req.body;
 
+  const updatedCourse = await Course.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
+  if (!updatedCourse) {
+    return res.status(404).json({ success: false, message: 'Course not found' });
+  }
+  res.json({ success: true, course: updatedCourse });
+});
 
-    const fieldsToUpdate = ['title', 'description', 'instructor'];
-    const hasUpdates = fieldsToUpdate.some(field => updatedData[field] !== undefined);
+// Soft delete a course
+exports.softDeleteCourse = asyncHandler(async (req, res) => {
+  const { id } = req.params;  // Course ID from the URL
 
-    if (!hasUpdates) {
-        return res.status(400).json({
-            success: false, 
-            message: 'Please provide at least one field to update: title, description, or instructor.'
-        });
-    }
+  const updatedCourse = await Course.findByIdAndUpdate(
+    id,
+    { deleted: true },  // Mark the course as deleted
+    { new: true }
+  );
 
-    try {
-        const updatedCourse = await Course.findByIdAndUpdate(id, updatedData, { new: true, runValidators: true });
-        if (!updatedCourse) {
-            return res.status(404).json({ success: false, message: 'Course not found' });
-        }
-        return res.json({ success: true, course: updatedCourse });
-    } catch (err) {
-        console.error('Error updating course:', err);
-        return res.status(400).json({
-            success: false, 
-            message: 'Error updating course', 
-            error: err.message 
-        });
-    }
-};
+  if (!updatedCourse) {
+    return res.status(404).json({ success: false, message: 'Course not found.' });
+  }
 
-//delete course
-exports.deleteCourse = async (req, res) => {
-    const { id } = req.params; 
+  res.json({ success: true, message: 'Course soft deleted successfully.' });
+});
 
-    try {
-        const deletedCourse = await Course.findByIdAndDelete(id);
-        if (!deletedCourse) {
-            return res.status(404).json({ success: false, message: 'Course not found' });
-        }
-        return res.json({ success: true, message: 'Course deleted successfully' });
-    } catch (err) {
-        console.error('Error deleting course:', err);
-        return res.status(500).json({
-            success: false,
-            message: 'Error deleting course',
-            error: err.message
-        });
-    }
-};
+// Update only the instructor of a course
+exports.updateInstructor = asyncHandler(async (req, res) => {
+  const { id } = req.params;  // Course ID from the URL
+  const { instructor } = req.body;  // New instructor from the request body
+
+  if (!instructor) {
+    return res.status(400).json({ success: false, message: 'Instructor is required.' });
+  }
+
+  const updatedCourse = await Course.findByIdAndUpdate(id, { instructor }, { new: true, runValidators: true });
+
+  if (!updatedCourse) {
+    return res.status(404).json({ success: false, message: 'Course not found.' });
+  }
+
+  res.json({ success: true, course: updatedCourse });
+});
+
+// Update only the deadline of a course
+exports.updateDeadline = asyncHandler(async (req, res) => {
+  const { id } = req.params;  // Course ID from the URL
+  const { deadline } = req.body;  // New deadline from the request body
+
+  if (!deadline) {
+    return res.status(400).json({ success: false, message: 'Deadline is required.' });
+  }
+
+  const updatedCourse = await Course.findByIdAndUpdate(id, { deadline: new Date(deadline) }, { new: true, runValidators: true });
+
+  if (!updatedCourse) {
+    return res.status(404).json({ success: false, message: 'Course not found.' });
+  }
+
+  res.json({ success: true, course: updatedCourse });
+});
