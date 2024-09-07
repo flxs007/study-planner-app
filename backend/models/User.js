@@ -1,3 +1,4 @@
+// models/User.js
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -12,27 +13,19 @@ const UserSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     unique: true, 
-    match: /.+\@.+\..+/ // email validation
+    match: /.+\@.+\..+/  // email validation
   },
   password: { 
     type: String, 
     required: true, 
     minlength: 6 
+  },
+  role: {  // Add role field for RBAC
+    type: String,
+    enum: ['admin', 'instructor', 'student'],  // Define possible roles
+    default: 'student'  // Default role
   }
 });
-
-// 
-// UserSchema.pre('save', async function(next) {
-//   if (this.isModified('password')) {
-//     this.password = await bcrypt.hash(this.password, 10);
-//   }
-//   next();
-// });
-
-// 
-// UserSchema.methods.comparePassword = async function(candidatePassword) {
-//   return await bcrypt.compare(candidatePassword, this.password);
-// };
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
